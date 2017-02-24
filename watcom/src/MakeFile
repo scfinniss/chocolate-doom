@@ -1,0 +1,172 @@
+SRC = ..\..\src\
+
+COMMON_SOURCE_FILES= &
+  $(ODIR)i_main.obj &
+  $(ODIR)i_system.obj &
+  $(ODIR)m_argv.obj &
+  $(ODIR)m_misc.obj
+
+GAME_SOURCE_FILES=&
+  $(ODIR)d_event.obj &
+  $(ODIR)d_iwad.obj &
+  $(ODIR)d_loop.obj &
+  $(ODIR)d_mode.obj &
+  $(ODIR)deh_str.obj &
+  $(ODIR)i_cdmus.obj &
+  $(ODIR)i_endoom.obj &
+  $(ODIR)i_joystick.obj &
+  $(ODIR)i_scale.obj &
+  $(ODIR)i_sound.obj &
+  $(ODIR)i_timer.obj &
+  $(ODIR)i_video.obj &
+  $(ODIR)i_videohr.obj &
+  $(ODIR)m_bbox.obj &
+  $(ODIR)m_cheat.obj &
+  $(ODIR)m_config.obj &
+  $(ODIR)m_controls.obj &
+  $(ODIR)m_fixed.obj &
+  $(ODIR)sha1.obj &
+  $(ODIR)memio.obj &
+  $(ODIR)tables.obj &
+  $(ODIR)v_diskicon.obj &
+  $(ODIR)v_video.obj &
+  $(ODIR)w_checksum.obj &
+  $(ODIR)w_main.obj &
+  $(ODIR)w_wad.obj &
+  $(ODIR)w_file.obj &
+  $(ODIR)w_file_stdc.obj &
+  $(ODIR)w_file_posix.obj &
+  $(ODIR)w_file_win32.obj &
+  $(ODIR)z_zone.obj
+
+FEATURE_DEHACKED_SOURCE_FILES=&
+  $(ODIR)deh_io.obj &
+  $(ODIR)deh_main.obj &
+  $(ODIR)deh_mapping.obj &
+  $(ODIR)deh_text.obj
+
+FEATURE_MULTIPLAYER_SOURCE_FILES=&
+  $(ODIR)aes_prng.obj &
+  $(ODIR)net_client.obj &
+  $(ODIR)net_common.obj &
+  $(ODIR)net_dedicated.obj &
+  $(ODIR)net_gui.obj &
+  $(ODIR)net_io.obj &
+  $(ODIR)net_loop.obj &
+  $(ODIR)net_packet.obj &
+  $(ODIR)net_query.obj &
+  $(ODIR)net_sdl.obj &
+  $(ODIR)net_server.obj &
+  $(ODIR)net_structrw.obj
+
+FEATURE_WAD_MERGE_SOURCE_FILES=&
+  $(ODIR)w_merge.obj
+
+FEATURE_SOUND_SOURCE_FILES=&
+  $(ODIR)gusconf.obj &
+  $(ODIR)i_pcsound.obj &
+  $(ODIR)i_sdlsound.obj &
+  $(ODIR)i_sdlmusic.obj &
+  $(ODIR)i_oplmusic.obj &
+  $(ODIR)midifile.obj &
+  $(ODIR)mus2mid.obj
+
+DEDSERV_FILES=&
+	$(ODIR)d_dedicated.obj &
+	$(ODIR)d_mode.obj &
+	$(ODIR)i_timer.obj &
+	$(ODIR)net_common.obj &
+	$(ODIR)net_dedicated.obj &
+	$(ODIR)net_io.obj &
+	$(ODIR)net_packet.obj &
+	$(ODIR)net_sdl.obj &
+	$(ODIR)net_query.obj &
+	$(ODIR)net_server.obj &
+	$(ODIR)net_structrw.obj &
+	$(ODIR)z_native.obj
+
+SETUP_FILES= &
+	$(ODIR)deh_str.obj &
+	$(ODIR)d_mode.obj &
+	$(ODIR)d_iwad.obj &
+	$(ODIR)i_timer.obj &
+	$(ODIR)m_config.obj &
+	$(ODIR)m_controls.obj &
+	$(ODIR)net_io.obj &
+	$(ODIR)net_packet.obj &
+	$(ODIR)net_sdl.obj &
+	$(ODIR)net_query.obj &
+	$(ODIR)net_structrw.obj &
+	$(ODIR)z_native.obj
+
+EXTRA_LIBS = &
+ $(LIBDIR)opl.lib &
+ $(LIBDIR)pcsound.lib &
+ $(LIBDIR)textscreen.lib
+
+SOURCE_FILES = $(COMMON_SOURCE_FILES) &
+   $(GAME_SOURCE_FILES)                &
+   $(FEATURE_WAD_MERGE_SOURCE_FILES)   &
+   $(FEATURE_SOUND_SOURCE_FILES)       &
+   $(FEATURE_MULTIPLAYER_SOURCE_FILES)
+
+DOOM_OBJS = $(SOURCE_FILES) &
+  $(FEATURE_DEHACKED_SOURCE_FILES) &
+  $(EXTRA_LIBS) &
+  $(LIBDIR)doom.lib
+
+HERETIC_OBJS = $(SOURCE_FILES) &
+  $(FEATURE_DEHACKED_SOURCE_FILES) &
+  $(EXTRA_LIBS) &
+  $(LIBDIR)heretic.lib
+
+HEXEN_OBJS = $(SOURCE_FILES) &
+  $(EXTRA_LIBS) &
+  $(LIBDIR)hexen.lib
+
+STRIFE_OBJS = $(SOURCE_FILES) &
+  $(FEATURE_DEHACKED_SOURCE_FILES) &
+  $(EXTRA_LIBS) &
+  $(LIBDIR)strife.lib
+
+SETUP_OBJS= &
+	$(COMMON_SOURCE_FILES) &
+	$(SETUP_FILES) &
+	$(EXTRA_LIBS) &
+	$(LIBDIR)setup.lib
+
+DEDSERV_OBJS= &
+	$(COMMON_SOURCE_FILES) &
+	$(DEDSERV_FILES)
+
+!include ..\master.mif
+
+$(BINDIR)chocolate-doom.exe: $(DOOM_OBJS)
+	@echo link $@
+	@$(LINK) $(LINKARGS) /fe=$@ $<
+	@wrc -q win32.rc $@
+
+$(BINDIR)chocolate-heretic.exe: $(HERETIC_OBJS)
+	@echo link $@
+	@$(LINK) $(LINKARGS) /fe=$@ $<
+	@wrc -q win32.rc $@
+
+$(BINDIR)chocolate-hexen.exe: $(HEXEN_OBJS)
+	@echo link $@
+	@$(LINK) $(LINKARGS) /fe=$@ $<
+	@wrc -q win32.rc $@
+
+$(BINDIR)chocolate-strife.exe: $(STRIFE_OBJS)
+	@echo link $@
+	@$(LINK) $(LINKARGS) /fe=$@ $<
+	@wrc -q win32.rc $@
+
+$(BINDIR)chocolate-setup.exe: $(SETUP_OBJS)
+	@echo link $@
+	@$(LINK) $(LINKARGS) /fe=$@ $<
+	@wrc -q -DCHOCOLATESETUP=1 win32.rc $@
+
+$(BINDIR)chocolate-server.exe: $(DEDSERV_OBJS)
+	@echo link $@
+	@$(LINK) $(LINKARGS) /fe=$@ $<
+	@wrc -q -DDEDICATEDSERVER=1 win32.rc $@

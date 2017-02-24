@@ -1,0 +1,27 @@
+SRC = ..\..\textscreen\
+
+LIBNAME = textscreen
+
+OBJS=                        &
+  $(ODIR)txt_checkbox.obj    &
+  $(ODIR)txt_desktop.obj     &
+  $(ODIR)txt_dropdown.obj    &
+  $(ODIR)txt_fileselect.obj  &
+  $(ODIR)txt_gui.obj         &
+  $(ODIR)txt_inputbox.obj    &
+  $(ODIR)txt_io.obj          &
+  $(ODIR)txt_button.obj      &
+  $(ODIR)txt_label.obj       &
+  $(ODIR)txt_radiobutton.obj &
+  $(ODIR)txt_scrollpane.obj  &
+  $(ODIR)txt_separator.obj   &
+  $(ODIR)txt_spinctrl.obj    &
+  $(ODIR)txt_sdl.obj         &
+  $(ODIR)txt_strut.obj       &
+  $(ODIR)txt_table.obj       &
+  $(ODIR)txt_utf8.obj        &
+  $(ODIR)txt_widget.obj      &
+  $(ODIR)txt_window.obj      &
+  $(ODIR)txt_window_action.obj
+
+!include ..\master.mif

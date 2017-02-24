@@ -1,0 +1,54 @@
+SRC = ..\..\..\src\hexen\
+
+LIBNAME = hexen
+
+OBJS= &
+ $(ODIR)a_action.obj &
+ $(ODIR)am_map.obj &
+ $(ODIR)ct_chat.obj &
+ $(ODIR)d_net.obj &
+ $(ODIR)f_finale.obj &
+ $(ODIR)g_game.obj &
+ $(ODIR)h2_main.obj &
+ $(ODIR)info.obj &
+ $(ODIR)in_lude.obj &
+ $(ODIR)m_random.obj &
+ $(ODIR)mn_menu.obj &
+ $(ODIR)p_acs.obj &
+ $(ODIR)p_anim.obj &
+ $(ODIR)p_ceilng.obj &
+ $(ODIR)p_doors.obj &
+ $(ODIR)p_enemy.obj &
+ $(ODIR)p_floor.obj &
+ $(ODIR)p_inter.obj &
+ $(ODIR)p_lights.obj &
+ $(ODIR)p_map.obj &
+ $(ODIR)p_maputl.obj &
+ $(ODIR)p_mobj.obj &
+ $(ODIR)po_man.obj &
+ $(ODIR)p_plats.obj &
+ $(ODIR)p_pspr.obj &
+ $(ODIR)p_setup.obj &
+ $(ODIR)p_sight.obj &
+ $(ODIR)p_spec.obj &
+ $(ODIR)p_switch.obj &
+ $(ODIR)p_telept.obj &
+ $(ODIR)p_things.obj &
+ $(ODIR)p_tick.obj &
+ $(ODIR)p_user.obj &
+ $(ODIR)r_bsp.obj &
+ $(ODIR)r_data.obj &
+ $(ODIR)r_draw.obj &
+ $(ODIR)r_main.obj &
+ $(ODIR)r_plane.obj &
+ $(ODIR)r_segs.obj &
+ $(ODIR)r_things.obj &
+ $(ODIR)s_sound.obj &
+ $(ODIR)sb_bar.obj &
+ $(ODIR)sc_man.obj &
+ $(ODIR)sn_sonix.obj &
+ $(ODIR)sounds.obj &
+ $(ODIR)st_start.obj &
+ $(ODIR)sv_save.obj &
+
+!include ..\..\master.mif

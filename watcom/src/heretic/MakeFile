@@ -1,0 +1,53 @@
+SRC = ..\..\..\src\heretic\
+
+LIBNAME = heretic
+
+OBJS= &
+ $(ODIR)am_map.obj &
+ $(ODIR)ct_chat.obj &
+ $(ODIR)d_main.obj &
+ $(ODIR)d_net.obj &
+ $(ODIR)f_finale.obj &
+ $(ODIR)g_game.obj &
+ $(ODIR)info.obj &
+ $(ODIR)in_lude.obj &
+ $(ODIR)m_random.obj &
+ $(ODIR)mn_menu.obj &
+ $(ODIR)p_ceilng.obj &
+ $(ODIR)p_doors.obj &
+ $(ODIR)p_enemy.obj &
+ $(ODIR)p_floor.obj &
+ $(ODIR)p_inter.obj &
+ $(ODIR)p_lights.obj &
+ $(ODIR)p_map.obj &
+ $(ODIR)p_maputl.obj &
+ $(ODIR)p_mobj.obj &
+ $(ODIR)p_plats.obj &
+ $(ODIR)p_pspr.obj &
+ $(ODIR)p_saveg.obj &
+ $(ODIR)p_setup.obj &
+ $(ODIR)p_sight.obj &
+ $(ODIR)p_spec.obj &
+ $(ODIR)p_switch.obj &
+ $(ODIR)p_telept.obj &
+ $(ODIR)p_tick.obj &
+ $(ODIR)p_user.obj &
+ $(ODIR)r_bsp.obj &
+ $(ODIR)r_data.obj &
+ $(ODIR)r_draw.obj &
+ $(ODIR)r_main.obj &
+ $(ODIR)r_plane.obj &
+ $(ODIR)r_segs.obj &
+ $(ODIR)r_things.obj &
+ $(ODIR)sb_bar.obj &
+ $(ODIR)sounds.obj &
+ $(ODIR)s_sound.obj &
+ $(ODIR)deh_ammo.obj &
+ $(ODIR)deh_frame.obj &
+ $(ODIR)deh_htext.obj &
+ $(ODIR)deh_htic.obj &
+ $(ODIR)deh_sound.obj &
+ $(ODIR)deh_thing.obj &
+ $(ODIR)deh_weapon.obj
+
+!include ..\..\master.mif

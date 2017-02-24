@@ -1,0 +1,80 @@
+MAKE_DIR=$(%cdrive):$(%cwd)
+BINDIR = $(MAKE_DIR)\bin\
+LIBDIR = $(MAKE_DIR)\lib\
+
+.before:
+	@set MAKE_DIR=$(MAKE_DIR)
+	@if not exist $(LIBDIR) (mkdir $(LIBDIR))
+	@if not exist $(BINDIR) (mkdir $(BINDIR))
+
+binaries=&
+	$(BINDIR)chocolate-doom.exe &
+	$(BINDIR)chocolate-heretic.exe &
+	$(BINDIR)chocolate-hexen.exe &
+	$(BINDIR)chocolate-strife.exe &
+	$(BINDIR)chocolate-setup.exe &
+	$(BINDIR)chocolate-server.exe
+
+all: $(binaries) .symbolic
+
+doom: $(BINDIR)chocolate-doom.exe $(BINDIR)chocolate-setup.exe .symbolic
+
+heretic: $(BINDIR)chocolate-heretic.exe $(BINDIR)chocolate-setup.exe .symbolic
+
+hexen: $(BINDIR)chocolate-hexen.exe $(BINDIR)chocolate-setup.exe .symbolic
+
+strife: $(BINDIR)chocolate-strife.exe $(BINDIR)chocolate-setup.exe .symbolic
+
+server: $(BINDIR)chocolate-server.exe .symbolic
+
+$(BINDIR)chocolate-server.exe: .always
+	@cd src && wmake /h $(BINDIR)chocolate-server.exe
+
+$(BINDIR)chocolate-setup.exe: $(LIBDIR)opl.lib $(LIBDIR)pcsound.lib $(LIBDIR)textscreen.lib $(LIBDIR)setup.lib .always
+	@cd src && wmake /h $(BINDIR)chocolate-setup.exe
+
+$(BINDIR)chocolate-strife.exe: $(LIBDIR)opl.lib $(LIBDIR)pcsound.lib $(LIBDIR)textscreen.lib $(LIBDIR)strife.lib .always
+	@cd src && wmake /h $(BINDIR)chocolate-strife.exe
+
+$(BINDIR)chocolate-heretic.exe: $(LIBDIR)opl.lib $(LIBDIR)pcsound.lib $(LIBDIR)textscreen.lib $(LIBDIR)heretic.lib .always
+	@cd src && wmake /h $(BINDIR)chocolate-heretic.exe
+
+$(BINDIR)chocolate-hexen.exe: $(LIBDIR)opl.lib $(LIBDIR)pcsound.lib $(LIBDIR)textscreen.lib $(LIBDIR)hexen.lib .always
+	@cd src && wmake /h $(BINDIR)chocolate-hexen.exe
+
+$(BINDIR)chocolate-doom.exe: $(LIBDIR)opl.lib $(LIBDIR)pcsound.lib $(LIBDIR)textscreen.lib $(LIBDIR)doom.lib .always
+	@cd src && wmake /h $(BINDIR)chocolate-doom.exe
+
+$(LIBDIR)setup.lib: .always
+	@cd src\setup && wmake /h
+
+$(LIBDIR)strife.lib: .always
+	@cd src\strife && wmake /h
+
+$(LIBDIR)hexen.lib: .always
+	@cd src\hexen && wmake /h
+
+$(LIBDIR)heretic.lib: .always
+	@cd src\heretic && wmake /h
+
+$(LIBDIR)doom.lib: .always
+	@cd src\doom && wmake /h
+
+$(LIBDIR)opl.lib: .always
+	@cd opl && wmake /h
+
+$(LIBDIR)pcsound.lib: .always
+	@cd pcsound && wmake /h
+
+$(LIBDIR)textscreen.lib: .always
+	@cd textscreen && wmake /h
+
+clean: .symbolic
+	@del /S *.lib
+	@del /S *.err
+	@del /S *.obj
+	@del /S *.exe
+	@del /S *.map
+	@del /S *.res
+
+rebuild: clean all .symbolic

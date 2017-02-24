@@ -1,0 +1,9 @@
+*.err
+*.bak
+*.lib
+*.exe
+*.wad
+*.dll
+*.cfg
+*.map
+*.res

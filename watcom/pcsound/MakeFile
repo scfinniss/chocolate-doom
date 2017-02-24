@@ -1,0 +1,12 @@
+SRC = ..\..\pcsound\
+
+LIBNAME = pcsound
+
+OBJS=                      &
+  $(ODIR)pcsound.obj       &
+  $(ODIR)pcsound_bsd.obj   &
+  $(ODIR)pcsound_sdl.obj   &
+  $(ODIR)pcsound_linux.obj &
+  $(ODIR)pcsound_win32.obj
+
+!include ..\master.mif

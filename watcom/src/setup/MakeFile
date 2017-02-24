@@ -1,0 +1,21 @@
+SRC = ..\..\..\src\setup\
+
+LIBNAME = setup
+
+OBJS = &
+	$(ODIR)compatibility.obj &
+	$(ODIR)display.obj &
+	$(ODIR)joystick.obj &
+	$(ODIR)keyboard.obj &
+	$(ODIR)mainmenu.obj &
+	$(ODIR)mode.obj &
+	$(ODIR)mouse.obj &
+	$(ODIR)multiplayer.obj &
+	$(ODIR)sound.obj &
+	$(ODIR)execute.obj &
+	$(ODIR)txt_joyaxis.obj &
+	$(ODIR)txt_joybinput.obj &
+	$(ODIR)txt_keyinput.obj &
+	$(ODIR)txt_mouseinput.obj
+
+!include ..\..\master.mif

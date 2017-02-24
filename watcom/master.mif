@@ -1,0 +1,50 @@
+MAKE_DIR=$(%MAKE_DIR)
+CC = wcl386
+CLIB = wlib
+LINK = wcl386
+ODIR = $(%cdrive):$(%cwd)\obj\
+
+!ifndef LIBDIR
+LIBDIR = $(%MAKE_DIR)\lib\
+!endif
+
+!ifndef BINDIR
+BINDIR = $(%MAKE_DIR)\bin\
+!endif
+
+!ifdef %DEBUG
+CCARGS = /q /c /6s /ei /ecc /ef /bt=nt /bm /wx /fp6 /fpi87         /d_UINTPTR_T_DEFINED /dSDL_main=main    /d1 /d2 /d3 /i=$(MAKE_DIR)\include /i=$(MAKE_DIR)\..\src /i=$(MAKE_DIR)\..\textscreen /i=$(MAKE_DIR)\..\pcsound /i=$(MAKE_DIR)\..\opl
+!else
+CCARGS = /q /c /6s /ei /ecc /ef /bt=nt /bm /wx /fp6 /fpi87 /otexam /d_UINTPTR_T_DEFINED /dSDL_main=main /s             /i=$(MAKE_DIR)\include /i=$(MAKE_DIR)\..\src /i=$(MAKE_DIR)\..\textscreen /i=$(MAKE_DIR)\..\pcsound /i=$(MAKE_DIR)\..\opl
+!endif
+
+!ifdef SRC
+.c: $(SRC);
+!endif
+
+.c.obj: .autodepend
+    @echo compile $@
+    @$(CC) $(CCARGS) /fo=$@ $<
+
+LIBARGS = /q /b /n
+
+!ifdef %DEBUG
+LINKARGS = /q /cc /bcl=nt_win /d1 /d2 /d3 /fm -"libpath $(%lib)" -"lib SDL lib SDL_Mixer lib SDL_Net"
+!else
+LINKARGS = /q /cc /bcl=nt_win -"lib SDL lib SDL_Mixer lib SDL_Net"
+!endif
+
+.before:
+  @if not exist $(ODIR) (mkdir $(ODIR))
+
+!ifdef LIBNAME
+$(LIBDIR)$(LIBNAME).lib: $(OBJS)
+  @echo lib $@
+  @$(CLIB) $(LIBARGS) $@ $<
+!endif
+
+!ifdef BINNAME
+$(BINDIR)$(BINNAME): $(EXE_OBJS)
+  @echo link $@
+  @$(LINK) $(LINKARGS) /fe=$@ $<
+!endif

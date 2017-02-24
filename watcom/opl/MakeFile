@@ -1,0 +1,16 @@
+SRC = ..\..\opl\
+
+LIBNAME = opl
+
+OBJS=                   &
+  $(ODIR)opl.obj        &
+  $(ODIR)opl_linux.obj  &
+  $(ODIR)opl_obsd.obj   &
+  $(ODIR)opl_queue.obj  &
+  $(ODIR)opl_sdl.obj    &
+  $(ODIR)opl_timer.obj  &
+  $(ODIR)opl_win32.obj  &
+  $(ODIR)ioperm_sys.obj &
+  $(ODIR)opl3.obj
+
+!include ..\master.mif
