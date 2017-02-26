@@ -11,4 +11,4 @@
 * wmake.
 
 ## Example
-![Alt text](/doc/example.png?raw=true "Example Screenshot")
+![Alt text](/watcom/doc/example.png?raw=true "Example Screenshot")
