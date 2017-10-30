@@ -79,7 +79,7 @@ static void AddIWADDir(char *dir)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-typedef struct 
+typedef struct
 {
     HKEY root;
     char *path;
@@ -88,7 +88,7 @@ typedef struct
 
 #define UNINSTALLER_STRING "\\uninstl.exe /S "
 
-// Keys installed by the various CD editions.  These are actually the 
+// Keys installed by the various CD editions.  These are actually the
 // commands to invoke the uninstaller and look like this:
 //
 // C:\Program Files\Path\uninstl.exe /S C:\Program Files\Path
@@ -362,148 +362,127 @@ static void AddSteamLibraryDir(char *dir)
     }
 }
 
-//Read whole of libraryfolders.vdf as string
-//silently fail is something goes wrong reading the file
-
-static char *GetSteamLibText(char *library_path)
-{
-    char *library_file_buffer;
-    size_t library_file_size;
-    size_t count;
-    char *probe;
-    FILE *library_file;
-
-    probe = M_FileCaseExists(library_path);
-
-    if (probe == NULL)
-    {
-        return NULL;
-    }
-
-    library_file = fopen(probe, "rb");
-
-    if (library_file == NULL)
-    {
-        return NULL;
-    }
-
-    library_file_size = M_FileLength(library_file);
-    library_file_buffer = malloc(library_file_size + 1);
-    count = fread(library_file_buffer, 1, library_file_size, library_file);
-    fclose(library_file);
-
-    if (library_file_size != count)
-    {
-        free(library_file_buffer);
-        return NULL;
-    }
-
-    library_file_buffer[library_file_size] = '\0';
-    return library_file_buffer;
-}
-
 //Retrieve tokens from file in Valve Data File (VDF) format
 
-static char *GetNextSteamLibToken(char **lib_file_buffer)
+static const char *TOKEN_OPEN_BRACE = "{";
+static const char *TOKEN_CLOSE_BRACE = "}";
+//static char *TOKEN_UNKNOWN = "";
+static const char *TOKEN_EOF = "\0";
+
+static char *GetQuotedToken(char **buffer)
 {
-    char c, *buffer, *token;
-    size_t i, j, buff_size, token_size;
-    boolean success, quote;
+    char *token;
+    size_t i, j, token_size;
 
-    token = NULL;  //In VDF a token is anything surrounded by white space.
-                   //Token may or may not be in double quotes.
-                   //Special characters can be escaped with a back slash.
+    token = *buffer;
 
-    success = false;
-    buffer = *lib_file_buffer;
-    buff_size = strlen(buffer);
-
-    for (i=0; i<buff_size; ++i)
+    for (i = 1; token[i] != '"'; ++i)
     {
-        c = buffer[i];
-
-        //{ and } are control characters in VDF used to indicate subkeys.
-        //If we treat } as white space and allow { to be treated as a regular
-        //token, then we can ignore the concept of subkeys in a VDF file.
-        //This allows us to treat a VDF file as key value pairs.
-
-        if (isspace(c) || c == '}')
+        if (token[i] == '\\')
         {
-            continue;
+            ++i; //next character is escaped, skip it
         }
-
-        quote = c == '"';
-        token = &buffer[i++];
-        break;
     }
 
-    for (; i<buff_size; ++i)
-    {
-        c = buffer[i];
+    token[++i] = '\0';
+    token_size = strlen(token);
+    *buffer = &token[i+1];
 
-        if (quote)
+    //remove escape characters and quotes from token
+    for (i=0, j=0; i<token_size; ++i, ++j)
+    {
+        if ((j == 0 || j == token_size - 1) && token[j] == '"')
         {
-            if (c == '\\')
-            {
-                ++i; //next character is escaped, skip it
-            }
-            else if (c == '"')
-            {
-                quote = false;
-            }
+            ++j;
+        }
+
+        if (token[j] == '\\' && (j == 0 || token[j-1] != '\\'))
+        {
+            ++j;
+        }
+
+        if (j >= token_size)
+        {
+            token[i] = '\0';
         }
         else
         {
-            if (isspace(c) || c == '}')
-            {
-                success = true;
-                break;
-            }
+            token[i] = token[j];
         }
     }
 
-    if(success)
+    printf("%s\n", token);
+
+    return token;
+}
+
+static char *GetUnQuotedToken(char **buffer)
+{
+    char *token;
+    size_t i;
+    token = *buffer;
+
+    for (i = 0; !isspace(token[i]); ++i)
     {
-        quote = token[0] == '"';
-        token_size = &buffer[i] - token;
-        *lib_file_buffer += i + 1; //move lib_file_buffer ahead of last token
+    }
 
-        //remove escape characters and quotes from token
-        for (i=0, j=0; i<token_size; ++i, ++j)
+    token[i] = '\0';
+    *buffer = &token[i+1];
+
+    printf("%s\n", token);
+
+    return token;
+}
+
+static char *GetNextSteamLibToken(char **lib_file_buffer)
+{
+    char c, *buffer;
+    size_t i, buff_size;
+
+    buffer = *lib_file_buffer;
+    buff_size = strlen(buffer);
+
+    for (i = 0; i < buff_size; i++)
+    {
+        if (!isspace(buffer[i]))
         {
-            if (quote && (j == 0 || j == token_size - 1) && token[j] == '"')
-            {
-                ++j;
-            }
-
-            if (token[j] == '\\' && (token[j-1] != '\\' || j == 0))
-            {
-                ++j;
-            }
-
-            if (j >= token_size)
-            {
-                token[i] = '\0';
-            }
-            else
-            {
-                token[i] = token[j];
-            }
+            break;
         }
+    }
 
-        token[token_size] = '\0';
+    if (i >= buff_size)
+    {
+        return (char*)TOKEN_EOF;
+    }
 
-        return token;
+    buffer = *lib_file_buffer = &buffer[i];
+
+    c = buffer[0];
+
+    if (c == '{')
+    {
+        (*lib_file_buffer)++;
+        return (char*)TOKEN_OPEN_BRACE;
+    }
+    else if (c == '}')
+    {
+        (*lib_file_buffer)++;
+        return (char*)TOKEN_CLOSE_BRACE;
+    }
+    else if (c == '"')
+    {
+        return GetQuotedToken(lib_file_buffer);
     }
     else
     {
-        return NULL;
+        return GetUnQuotedToken(lib_file_buffer);
     }
 }
 
 static boolean IsValidSteamLibKey(char* key)
 {
     size_t i;
+
     for (i=0; i<strlen(key); ++i)
     {
         if (!isdigit(key[i]))
@@ -515,56 +494,79 @@ static boolean IsValidSteamLibKey(char* key)
     return true;
 }
 
-static char *GetSteamNextLibPath(char **lib_file_buffer)
+static void ParseSteamLibFileKeys(char **buffer, char *key, int depth)
 {
     char *keyToken;
     char *valueToken;
 
     for (;;)
     {
-        keyToken = GetNextSteamLibToken(lib_file_buffer);
-        valueToken = GetNextSteamLibToken(lib_file_buffer);
+        keyToken = GetNextSteamLibToken(buffer);
 
-        if (keyToken == NULL || valueToken == NULL)
+        if (keyToken == TOKEN_EOF) //EOF
         {
-            return NULL;
+            if (depth != 0)
+            {
+                printf("Steam library ended prematurely");
+            }
+            return;
+        }
+        else if (keyToken == TOKEN_OPEN_BRACE) //Error
+        {
+            printf("Unexpected token \"%s\"", keyToken);
+            return;
+        }
+        else if (keyToken == TOKEN_CLOSE_BRACE) //End of key set
+        {
+            if (depth == 0)
+            {
+                printf("Unexpected token \"%s\"", keyToken);
+            }
+            return;
         }
 
-        if (IsValidSteamLibKey(keyToken))
+        valueToken = GetNextSteamLibToken(buffer);
+
+        if (valueToken == TOKEN_CLOSE_BRACE)
         {
-            return valueToken;
+            printf("Unexpected token \"%s\"", keyToken);
+        }
+        else if (valueToken == TOKEN_OPEN_BRACE) //New key set
+        {
+            ParseSteamLibFileKeys(buffer, keyToken, depth + 1);
+        }
+        else if (depth == 1 && !strcmp(key, "LibraryFolders") && IsValidSteamLibKey(keyToken))
+        {
+            AddSteamLibraryDir(valueToken);
         }
     }
+}
+
+static void ParseSteamLibFile(char* library_file_buffer)
+{
+    char *buffer;
+    buffer = library_file_buffer;
+    ParseSteamLibFileKeys(&buffer, NULL, 0);
 }
 
 static void CheckSteamLibraries(char *lib_file_path)
 {
     char *library_file_buffer;
-    char *buffer;
-    char *library_path;
+    char *probe;
+    size_t library_file_buffer_size;
 
-    library_file_buffer = buffer = GetSteamLibText(lib_file_path);
+    probe = M_FileCaseExists(lib_file_path);
 
-    if (library_file_buffer == NULL)
+    if (probe == NULL)
     {
         return;
     }
 
-    for (;;)
-    {
-        library_path = GetSteamNextLibPath(&buffer);
+    library_file_buffer_size = M_ReadFile (probe, &library_file_buffer);
+    //library_file_buffer[library_file_buffer_size] = '\0';
+    ParseSteamLibFile(library_file_buffer);
 
-        if (library_path != NULL)
-        {
-            AddSteamLibraryDir(library_path);
-        }
-        else
-        {
-            break;
-        }
-    }
-
-    free(library_file_buffer);
+    Z_Free(library_file_buffer);
 }
 
 static void CheckSteamEdition(void)
@@ -679,7 +681,7 @@ static boolean DirIsFile(char *path, char *filename)
 
 static char *CheckDirectoryHasIWAD(char *dir, char *iwadname)
 {
-    char *filename; 
+    char *filename;
     char *probe;
 
     // As a special case, the "directory" may refer directly to an
@@ -722,7 +724,7 @@ static char *SearchDirectoryForIWAD(char *dir, int mask, GameMission_t *mission)
     char *filename;
     size_t i;
 
-    for (i=0; i<arrlen(iwads); ++i) 
+    for (i=0; i<arrlen(iwads); ++i)
     {
         if (((1 << iwads[i].mission) & mask) == 0)
         {
@@ -933,14 +935,14 @@ static void BuildIWADDirList(void)
 
 //
 // Searches WAD search paths for an WAD with a specific filename.
-// 
+//
 
 char *D_FindWADByName(char *name)
 {
     char *path;
     char *probe;
     int i;
-    
+
     // Absolute path?
 
     probe = M_FileCaseExists(name);
@@ -1042,7 +1044,7 @@ char *D_FindIWAD(int mask, GameMission_t *mission)
         {
             I_Error("IWAD file '%s' not found!", iwadfile);
         }
-        
+
         *mission = IdentifyIWADByName(result, mask);
     }
     else
@@ -1052,7 +1054,7 @@ char *D_FindIWAD(int mask, GameMission_t *mission)
         result = NULL;
 
         BuildIWADDirList();
-    
+
         for (i=0; result == NULL && i<num_iwad_dirs; ++i)
         {
             result = SearchDirectoryForIWAD(iwad_dirs[i], mask, mission);
@@ -1157,4 +1159,3 @@ char *D_SuggestGameName(GameMission_t mission, GameMode_t mode)
 
     return "Unknown game?";
 }
-
